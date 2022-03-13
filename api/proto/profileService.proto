@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package profileService;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/3110Y/profile;profileGRPC";
+
+service ProfileService {
+  rpc Add(ProfileWithoutIdSystemField) returns(ProfileId);
+  rpc Edit(ProfileWithoutSystemField) returns(EmptyResponse);
+  rpc Delete(ProfileId) returns(EmptyResponse);
+  rpc Item(ProfileId) returns(ProfileWithoutPassword);
+  rpc List(ProfilePaginator) returns(ProfileList);
+  rpc EditWithoutPassword(ProfileWithoutIdSystemFieldPassword) returns(EmptyResponse);
+  rpc ChangePassword(ProfilePassword) returns(EmptyResponse);
+  rpc GetByEmailOrPhone(ProfileEmailPhonePassword) returns(ProfileWithoutPassword);
+}
+
+message ProfileWithoutIdSystemField {
+  string email = 1;
+  uint64 phone = 2;
+  string password = 3;
+  string surname = 4;
+  string name = 5;
+  string patronymic = 6;
+}
+
+message ProfileId {
+  string id = 1;
+}
+
+message EmptyResponse {
+}
+
+message ProfileWithoutSystemField {
+  string id = 1;
+  string email = 2;
+  uint64 phone = 3;
+  string password = 4;
+  string surname = 5;
+  string name = 6;
+  string patronymic = 7;
+}
+
+message ProfileWithoutPassword {
+  string id = 1;
+  string email = 2;
+  uint64 phone = 3;
+  string surname = 4;
+  string name = 5;
+  string patronymic = 6;
+  google.protobuf.Timestamp createAt = 7;
+  google.protobuf.Timestamp updateAt = 8;
+}
+
+message ProfilePaginator {
+  uint64 onPage = 1;
+  uint64 page = 2;
+}
+
+message ProfileList {
+  repeated ProfileWithoutPassword data = 1;
+  uint64 AllCount = 2;
+}
+
+message ProfileWithoutIdSystemFieldPassword {
+  string id = 1;
+  string email = 2;
+  uint64 phone = 3;
+  string surname = 4;
+  string name = 5;
+  string patronymic = 6;
+}
+
+message ProfilePassword {
+  string id = 1;
+  string password = 2;
+}
+
+message ProfileEmailPhonePassword {
+  string email = 1;
+  uint64 phone = 2;
+  string password = 3;
+}
+

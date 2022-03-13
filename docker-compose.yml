@@ -1,0 +1,151 @@
+version: '3.9'
+
+networks:
+  database:
+  database-test:
+
+services:
+
+  database: &database
+    container_name: database
+    image: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}" ]
+      timeout: 45s
+      interval: 2s
+      retries: 10
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT_EXTERNAL}:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    volumes:
+      - profile-database:/var/lib/postgresql/data:delegated
+    networks:
+      - database
+
+  database-test:
+    <<: *database
+    container_name: database-test
+    ports:
+      - ${POSTGRES_PORT_EXTERNAL}:${POSTGRES_PORT}
+    volumes:
+      - profile-database-test:/var/lib/postgresql/data:delegated
+    networks:
+      - database-test
+
+  dev:
+    container_name: profile-dev
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/golang/Dockerfile
+      target: golang_dev
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${GRPC_PORT}:${GRPC_PORT}
+      - "40000:40000"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - database
+
+  prod:
+    container_name: profile
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/golang/Dockerfile
+      target: golang_prod
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${GRPC_PORT}:${GRPC_PORT}
+      - "40000:40000"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - database
+
+  test:
+    container_name: profile-test
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/golang/Dockerfile
+      target: golang_test
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=database-test
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    depends_on:
+      database-test:
+        condition: service_healthy
+    networks:
+      - database-test
+
+  migrator: &migrator
+    container_name: migrator
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/goose/Dockerfile
+    volumes:
+      - ./:/app/migrations
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=sslmode=disable host=database port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB}
+    networks:
+      - database
+
+  migrator-test:
+    <<: *migrator
+    container_name: migrator-test
+    depends_on:
+      database-test:
+        condition: service_healthy
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=sslmode=disable host=database-test port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB}
+    networks:
+      - database-test
+
+volumes:
+  profile-database: { }
+  profile-database-test: { }
