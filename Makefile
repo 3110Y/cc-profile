@@ -53,7 +53,7 @@ test-test:
 # utilities
 .PHONY: proto
 proto:
-	docker-compose run --rm dev bash scripts/protoc.sh
+	docker-compose run --rm dev sh scripts/protoc.sh
 
 .PHONY: build
 build:

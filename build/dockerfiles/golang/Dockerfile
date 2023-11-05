@@ -34,9 +34,11 @@ FROM golang_base AS golang_dev
 ENV APP_PORT=8080
 VOLUME /app
 WORKDIR /app
+RUN apk update && apk add --no-cache make protobuf-dev
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 EXPOSE ${APP_PORT}
 CMD go run /app/cmd/main.go
-
 
 # ------------------------------------------------------------------------------
 # Production image
