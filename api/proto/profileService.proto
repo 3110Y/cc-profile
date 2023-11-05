@@ -12,7 +12,7 @@ service ProfileService {
   rpc Delete(ProfileId) returns(EmptyResponse);
   rpc Item(ProfileId) returns(ProfileWithoutPassword);
   rpc List(ProfilePaginator) returns(ProfileList);
-  rpc UpdateUser(ProfileWithoutIdSystemFieldPassword) returns(EmptyResponse);
+  rpc EditWithoutPassword(ProfileWithoutIdSystemFieldPassword) returns(EmptyResponse);
   rpc ChangePassword(ProfilePassword) returns(EmptyResponse);
   rpc GetByEmailOrPhone(ProfileEmailPhonePassword) returns(ProfileWithoutPassword);
 }
@@ -65,15 +65,17 @@ message ProfileList {
 }
 
 message ProfileWithoutIdSystemFieldPassword {
-  string email = 1;
-  uint64 phone = 2;
-  string surname = 3;
-  string name = 4;
-  string patronymic = 5;
+  string id = 1;
+  string email = 2;
+  uint64 phone = 3;
+  string surname = 4;
+  string name = 5;
+  string patronymic = 6;
 }
 
 message ProfilePassword {
-  string password = 1;
+  string id = 1;
+  string password = 2;
 }
 
 message ProfileEmailPhonePassword {

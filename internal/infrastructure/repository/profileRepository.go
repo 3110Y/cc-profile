@@ -25,7 +25,7 @@ func (p *ProfileRepository) Add(ctx context.Context, profile entity.Profile) (ui
 }
 
 func (p *ProfileRepository) Edit(ctx context.Context, profile entity.Profile) (uint64, error) {
-	dsn := "UPDATE profile SET id=:id, email=:email, phone=:phone, password=:password, surname=:surname, name=:name, patronymic=:patronymic WHERE id=:id;"
+	dsn := "UPDATE profile SET email=:email, phone=:phone, password=:password, surname=:surname, name=:name, patronymic=:patronymic WHERE id=:id;"
 	result, err := p.db.NamedExecContext(ctx, dsn, &profile)
 	if err != nil {
 		return 0, err
@@ -60,4 +60,33 @@ func (p *ProfileRepository) Count(ctx context.Context) (uint64, error) {
 	}{}
 	err := p.db.GetContext(ctx, &count, "SELECT COUNT(id) as c FROM profile")
 	return count.C, err
+}
+
+func (p *ProfileRepository) EditWithoutPassword(ctx context.Context, profile entity.Profile) (uint64, error) {
+	dsn := "UPDATE profile SET email=:email, phone=:phone, surname=:surname, name=:name, patronymic=:patronymic WHERE id=:id;"
+	result, err := p.db.NamedExecContext(ctx, dsn, &profile)
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	return uint64(rowsAffected), err
+}
+
+func (p *ProfileRepository) ChangePassword(ctx context.Context, profile entity.Profile) (uint64, error) {
+	dsn := "UPDATE profile SET password=:password WHERE id=:id;"
+	result, err := p.db.NamedExecContext(ctx, dsn, &profile)
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	return uint64(rowsAffected), err
+}
+
+func (p *ProfileRepository) GetByEmailOrPhone(
+	ctx context.Context,
+	email string,
+	phone uint64,
+) (profile entity.Profile, err error) {
+	err = p.db.GetContext(ctx, &profile, "SELECT * FROM profile WHERE email = $1 OR phone = $2", email, phone)
+	return profile, err
 }

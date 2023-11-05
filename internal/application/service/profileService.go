@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	utlits "github.com/3110Y/cc-utlits"
 	"github.com/3110Y/profile/internal/application/dto"
 	"github.com/3110Y/profile/internal/application/mapping"
@@ -18,6 +19,9 @@ type ProfileRepositoryInterface interface {
 	List(ctx context.Context, onPage uint64, page uint64) (profileList []entity.Profile, err error)
 	Delete(ctx context.Context, id string) (uint64, error)
 	Count(ctx context.Context) (uint64, error)
+	EditWithoutPassword(ctx context.Context, profile entity.Profile) (uint64, error)
+	ChangePassword(ctx context.Context, profile entity.Profile) (uint64, error)
+	GetByEmailOrPhone(ctx context.Context, email string, phone uint64) (profile entity.Profile, err error)
 }
 
 type PasswordServiceInterface interface {
@@ -83,4 +87,32 @@ func (p *ProfileService) List(ctx context.Context, onPage uint64, page uint64) (
 			AllCount: count,
 		},
 		nil
+}
+
+func (p *ProfileService) EditWithoutPassword(ctx context.Context, profileDTO dto.ProfileDTO) (uint64, error) {
+	entityProfile := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: profileDTO}).ToEntity()
+	return p.repositoryProfile.EditWithoutPassword(ctx, entityProfile)
+}
+
+func (p *ProfileService) ChangePassword(ctx context.Context, profileDTO dto.ProfileDTO) (uint64, error) {
+	entityProfile := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: profileDTO}).ToEntity()
+	return p.repositoryProfile.ChangePassword(ctx, entityProfile)
+}
+
+func (p *ProfileService) GetByEmailOrPhone(
+	ctx context.Context,
+	email string,
+	phone uint64,
+	password string,
+) (profileDto dto.ProfileDTO, err error) {
+	entityProfile, err := p.repositoryProfile.GetByEmailOrPhone(ctx, email, phone)
+	profileDto = utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
+	passwordHash, err := p.servicePassword.Encode(password)
+	if err != nil {
+		return profileDto, err
+	}
+	if passwordHash != *profileDto.Password {
+		err = errors.New("password mismatch")
+	}
+	return
 }

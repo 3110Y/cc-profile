@@ -13,9 +13,6 @@ func NewPasswordService() *PasswordService {
 }
 
 func (p PasswordService) Encode(password string) (passwordHash string, err error) {
-	if err != nil {
-		return "", nil
-	}
 	passwordSHA := sha512.Sum512([]byte(password))
 	return hex.EncodeToString(passwordSHA[:]), nil
 }

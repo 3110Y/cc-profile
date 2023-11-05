@@ -50,6 +50,21 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Add(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).Add), arg0, arg1)
 }
 
+// ChangePassword mocks base method.
+func (m *MockProfileRepositoryInterface) ChangePassword(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ChangePassword", arg0, arg1)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ChangePassword indicates an expected call of ChangePassword.
+func (mr *MockProfileRepositoryInterfaceMockRecorder) ChangePassword(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).ChangePassword), arg0, arg1)
+}
+
 // Count mocks base method.
 func (m *MockProfileRepositoryInterface) Count(arg0 context.Context) (uint64, error) {
 	m.ctrl.T.Helper()
@@ -95,6 +110,21 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Edit(arg0, arg1 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Edit", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).Edit), arg0, arg1)
 }
 
+// EditWithoutPassword mocks base method.
+func (m *MockProfileRepositoryInterface) EditWithoutPassword(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EditWithoutPassword", arg0, arg1)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EditWithoutPassword indicates an expected call of EditWithoutPassword.
+func (mr *MockProfileRepositoryInterfaceMockRecorder) EditWithoutPassword(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditWithoutPassword", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).EditWithoutPassword), arg0, arg1)
+}
+
 // Get mocks base method.
 func (m *MockProfileRepositoryInterface) Get(arg0 context.Context, arg1 string) (entity.Profile, error) {
 	m.ctrl.T.Helper()
@@ -108,6 +138,21 @@ func (m *MockProfileRepositoryInterface) Get(arg0 context.Context, arg1 string) 
 func (mr *MockProfileRepositoryInterfaceMockRecorder) Get(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).Get), arg0, arg1)
+}
+
+// GetByEmailOrPhone mocks base method.
+func (m *MockProfileRepositoryInterface) GetByEmailOrPhone(arg0 context.Context, arg1 string, arg2 uint64) (entity.Profile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByEmailOrPhone", arg0, arg1, arg2)
+	ret0, _ := ret[0].(entity.Profile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmailOrPhone indicates an expected call of GetByEmailOrPhone.
+func (mr *MockProfileRepositoryInterfaceMockRecorder) GetByEmailOrPhone(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmailOrPhone", reflect.TypeOf((*MockProfileRepositoryInterface)(nil).GetByEmailOrPhone), arg0, arg1, arg2)
 }
 
 // List mocks base method.

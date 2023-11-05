@@ -2,6 +2,8 @@ package rpc
 
 import (
 	"context"
+	"crypto/sha512"
+	"encoding/hex"
 	utlits "github.com/3110Y/cc-utlits"
 	"github.com/3110Y/profile/internal/application/mapping"
 	"github.com/3110Y/profile/internal/application/service"
@@ -54,6 +56,8 @@ func add(t *testing.T) entity.Profile {
 		Name:       "Name",
 		Patronymic: "Patronymic",
 	}
+	passwordSHA := sha512.Sum512([]byte(profileEntity.Password))
+	profileEntity.Password = hex.EncodeToString(passwordSHA[:])
 	_, err := repositoryProfile.Add(ctx, profileEntity)
 	assert.Nil(t, err)
 	return profileEntity
@@ -75,6 +79,7 @@ func TestProfile_Add(t *testing.T) {
 	profileItem := entity.Profile{}
 	err = database.GetById(&profileItem, "profile", add.Id, connect)
 	assert.Nil(t, err)
+	//goland:noinspection GoVetCopyLock
 	expected := utlits.Pointer(
 		mapping.ProfileWithoutIdSystemFieldGRPCMapping{
 			ProfileWithoutIdSystemField: in,
@@ -126,6 +131,7 @@ func TestProfileRPC_Edit(t *testing.T) {
 	assert.Nil(t, err)
 	err = database.GetById(&profileEntity, "profile", profileWithoutSystemField.Id, connect)
 	assert.Nil(t, err)
+	//goland:noinspection GoVetCopyLock
 	expected := utlits.Pointer(
 		mapping.ProfileWithoutSystemFieldGRPCMapping{
 			ProfileWithoutSystemField: profileWithoutSystemField,
@@ -152,4 +158,77 @@ func TestProfileRPC_List(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, onPage, uint64(len(profileList.Data)))
 	assert.Equal(t, count, profileList.AllCount)
+}
+
+func TestProfileRPC_EditWithoutPassword(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileEntity := add(t)
+	ProfileWithoutIdSystemFieldPassword := profileGRPC.ProfileWithoutIdSystemFieldPassword{
+		Id:         profileEntity.Id,
+		Email:      "test@test.test",
+		Phone:      79062579332,
+		Surname:    "Surname2",
+		Name:       "Name2",
+		Patronymic: "Patronymic2",
+	}
+	_, err := profileRPC.EditWithoutPassword(ctx, &ProfileWithoutIdSystemFieldPassword)
+	assert.Nil(t, err)
+	err = database.GetById(&profileEntity, "profile", ProfileWithoutIdSystemFieldPassword.Id, connect)
+	assert.Nil(t, err)
+	//goland:noinspection GoVetCopyLock
+	expected := utlits.Pointer(
+		mapping.ProfileWithoutIdSystemFieldPasswordMapping{
+			ProfileWithoutIdSystemFieldPassword: ProfileWithoutIdSystemFieldPassword,
+		},
+	).ToProfileDTO()
+	actual := utlits.Pointer(mapping.ProfileEntityMapping{Entity: profileEntity}).ToProfileDTO()
+	assert.Equal(t, *expected.Id, *actual.Id)
+	assert.NotEqual(t, expected.Password, actual.Password)
+	expected.Id = actual.Id
+	expected.CreateAt = actual.CreateAt
+	expected.UpdateAt = actual.UpdateAt
+	expected.Password = actual.Password
+	assert.Equal(t, expected, actual)
+}
+
+func TestProfileRPC_ChangePassword(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileEntity := add(t)
+	ProfilePassword := profileGRPC.ProfilePassword{
+		Id:       profileEntity.Id,
+		Password: profileEntity.Password,
+	}
+	_, err := profileRPC.ChangePassword(ctx, &ProfilePassword)
+	assert.Nil(t, err)
+	err = database.GetById(&profileEntity, "profile", ProfilePassword.Id, connect)
+	assert.Nil(t, err)
+	expected := profileGRPC.ProfilePassword{
+		Id:       ProfilePassword.Id,
+		Password: ProfilePassword.Password,
+	}
+	actual := utlits.Pointer(mapping.ProfileEntityMapping{Entity: profileEntity}).ToProfileDTO()
+	assert.Equal(t, expected.Id, *actual.Id)
+	assert.Equal(t, expected.Password, *actual.Password)
+}
+
+func TestProfileRPC_GetByEmailOrPhone(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileEntity := add(t)
+	in := profileGRPC.ProfileEmailPhonePassword{
+		Email:    profileEntity.Email,
+		Phone:    profileEntity.Phone,
+		Password: "Password8",
+	}
+	add, err := profileRPC.GetByEmailOrPhone(ctx, &in)
+	assert.Nil(t, err)
+	assert.Equal(t, profileEntity.Id, add.Id)
+
+	in = profileGRPC.ProfileEmailPhonePassword{
+		Email:    profileEntity.Email,
+		Phone:    profileEntity.Phone,
+		Password: profileEntity.Password,
+	}
+	add, err = profileRPC.GetByEmailOrPhone(ctx, &in)
+	assert.NotNil(t, err)
+	assert.Error(t, err, "password mismatch")
 }

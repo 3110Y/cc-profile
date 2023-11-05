@@ -111,3 +111,42 @@ func TestProfileService_List(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, profileListDTO, profileListDTOFilled)
 }
+
+func TestProfileService_EditWithoutPassword(t *testing.T) {
+	t.Parallel()
+	finish, repository, _, profile, entityProfile := prepare(t)
+	defer finish()
+	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
+	repository.EXPECT().EditWithoutPassword(ctx, entityProfile).Return(uint64(1), nil)
+	rowsAffected, err := profile.EditWithoutPassword(ctx, dtoProfile)
+	assert.Nil(t, err)
+	assert.Equal(t, rowsAffected, uint64(1))
+}
+
+func TestProfileService_ChangePassword(t *testing.T) {
+	t.Parallel()
+	finish, repository, _, profile, entityProfile := prepare(t)
+	defer finish()
+	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
+	repository.EXPECT().ChangePassword(ctx, entityProfile).Return(uint64(1), nil)
+	rowsAffected, err := profile.ChangePassword(ctx, dtoProfile)
+	assert.Nil(t, err)
+	assert.Equal(t, rowsAffected, uint64(1))
+}
+
+func TestProfileService_GetByEmailOrPhone(t *testing.T) {
+	t.Parallel()
+	finish, repository, passwordService, profile, entityProfile := prepare(t)
+	defer finish()
+	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
+	repository.EXPECT().GetByEmailOrPhone(ctx, entityProfile.Email, entityProfile.Phone).Return(entityProfile, nil)
+	passwordService.EXPECT().Encode(entityProfile.Password).Return(entityProfile.Password, nil)
+	dtoProfileFilled, err := profile.GetByEmailOrPhone(
+		ctx,
+		entityProfile.Email,
+		entityProfile.Phone,
+		entityProfile.Password,
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, dtoProfile, dtoProfileFilled)
+}

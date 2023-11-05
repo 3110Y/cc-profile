@@ -27,7 +27,7 @@ type ProfileServiceClient interface {
 	Delete(ctx context.Context, in *ProfileId, opts ...grpc.CallOption) (*EmptyResponse, error)
 	Item(ctx context.Context, in *ProfileId, opts ...grpc.CallOption) (*ProfileWithoutPassword, error)
 	List(ctx context.Context, in *ProfilePaginator, opts ...grpc.CallOption) (*ProfileList, error)
-	UpdateUser(ctx context.Context, in *ProfileWithoutIdSystemFieldPassword, opts ...grpc.CallOption) (*EmptyResponse, error)
+	EditWithoutPassword(ctx context.Context, in *ProfileWithoutIdSystemFieldPassword, opts ...grpc.CallOption) (*EmptyResponse, error)
 	ChangePassword(ctx context.Context, in *ProfilePassword, opts ...grpc.CallOption) (*EmptyResponse, error)
 	GetByEmailOrPhone(ctx context.Context, in *ProfileEmailPhonePassword, opts ...grpc.CallOption) (*ProfileWithoutPassword, error)
 }
@@ -85,9 +85,9 @@ func (c *profileServiceClient) List(ctx context.Context, in *ProfilePaginator, o
 	return out, nil
 }
 
-func (c *profileServiceClient) UpdateUser(ctx context.Context, in *ProfileWithoutIdSystemFieldPassword, opts ...grpc.CallOption) (*EmptyResponse, error) {
+func (c *profileServiceClient) EditWithoutPassword(ctx context.Context, in *ProfileWithoutIdSystemFieldPassword, opts ...grpc.CallOption) (*EmptyResponse, error) {
 	out := new(EmptyResponse)
-	err := c.cc.Invoke(ctx, "/profileService.ProfileService/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/profileService.ProfileService/EditWithoutPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ type ProfileServiceServer interface {
 	Delete(context.Context, *ProfileId) (*EmptyResponse, error)
 	Item(context.Context, *ProfileId) (*ProfileWithoutPassword, error)
 	List(context.Context, *ProfilePaginator) (*ProfileList, error)
-	UpdateUser(context.Context, *ProfileWithoutIdSystemFieldPassword) (*EmptyResponse, error)
+	EditWithoutPassword(context.Context, *ProfileWithoutIdSystemFieldPassword) (*EmptyResponse, error)
 	ChangePassword(context.Context, *ProfilePassword) (*EmptyResponse, error)
 	GetByEmailOrPhone(context.Context, *ProfileEmailPhonePassword) (*ProfileWithoutPassword, error)
 	mustEmbedUnimplementedProfileServiceServer()
@@ -146,8 +146,8 @@ func (UnimplementedProfileServiceServer) Item(context.Context, *ProfileId) (*Pro
 func (UnimplementedProfileServiceServer) List(context.Context, *ProfilePaginator) (*ProfileList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedProfileServiceServer) UpdateUser(context.Context, *ProfileWithoutIdSystemFieldPassword) (*EmptyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+func (UnimplementedProfileServiceServer) EditWithoutPassword(context.Context, *ProfileWithoutIdSystemFieldPassword) (*EmptyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditWithoutPassword not implemented")
 }
 func (UnimplementedProfileServiceServer) ChangePassword(context.Context, *ProfilePassword) (*EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
@@ -258,20 +258,20 @@ func _ProfileService_List_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProfileService_EditWithoutPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProfileWithoutIdSystemFieldPassword)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServiceServer).UpdateUser(ctx, in)
+		return srv.(ProfileServiceServer).EditWithoutPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/profileService.ProfileService/UpdateUser",
+		FullMethod: "/profileService.ProfileService/EditWithoutPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).UpdateUser(ctx, req.(*ProfileWithoutIdSystemFieldPassword))
+		return srv.(ProfileServiceServer).EditWithoutPassword(ctx, req.(*ProfileWithoutIdSystemFieldPassword))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -340,8 +340,8 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProfileService_List_Handler,
 		},
 		{
-			MethodName: "UpdateUser",
-			Handler:    _ProfileService_UpdateUser_Handler,
+			MethodName: "EditWithoutPassword",
+			Handler:    _ProfileService_EditWithoutPassword_Handler,
 		},
 		{
 			MethodName: "ChangePassword",

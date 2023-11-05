@@ -68,7 +68,7 @@ func TestProfile_Get(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), rowsAffected)
 	profileItem := entity.Profile{}
-	err = database.GetById(&profileItem, "profile", profileFilled.Id, connect)
+	profileItem, err = profileRepository.Get(ctxRepository, profileFilled.Id)
 	assert.Nil(t, err)
 	cleanAtInProfile(&profileItem, &profileFilled)
 	assert.Equal(t, profileFilled, profileItem)
@@ -170,4 +170,66 @@ func TestProfile_Count(t *testing.T) {
 	count, err := profileRepository.Count(ctxRepository)
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(2), count)
+}
+
+func TestProfileRepository_EditWithoutPassword(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileFilled := getEntityProfile()
+	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), rowsAffected)
+	profileEntity := entity.Profile{
+		Id:         profileFilled.Id,
+		Email:      "Email2",
+		Phone:      79062579332,
+		Surname:    "Surname2",
+		Name:       "Name2",
+		Patronymic: "Patronymic2",
+	}
+	rowsAffected, err = profileRepository.EditWithoutPassword(ctxRepository, profileEntity)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), rowsAffected)
+	profileEntityFilled := entity.Profile{}
+	err = database.GetById(&profileEntityFilled, "profile", profileEntity.Id, connect)
+	assert.Nil(t, err)
+	assert.Equal(t, &profileEntity.Id, &profileEntityFilled.Id)
+	assert.NotEqual(t, &profileEntity.Password, &profileEntityFilled.Password)
+	profileEntity.Id = profileEntityFilled.Id
+	profileEntity.CreateAt = profileEntityFilled.CreateAt
+	profileEntity.UpdateAt = profileEntityFilled.UpdateAt
+	profileEntity.Password = profileEntityFilled.Password
+	assert.Equal(t, profileEntity, profileEntityFilled)
+}
+
+func TestProfileRepository_ChangePassword(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileFilled := getEntityProfile()
+	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), rowsAffected)
+	profileEntity := entity.Profile{
+		Id:       profileFilled.Id,
+		Password: "Password82",
+	}
+	rowsAffected, err = profileRepository.ChangePassword(ctxRepository, profileEntity)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), rowsAffected)
+	profileEntityFilled := entity.Profile{}
+	err = database.GetById(&profileEntityFilled, "profile", profileEntity.Id, connect)
+	assert.Nil(t, err)
+	assert.Equal(t, &profileEntity.Password, &profileEntityFilled.Password)
+}
+
+func TestProfileRepository_GetByEmailOrPhone(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileFilled := getEntityProfile()
+	assert.NotNil(t, profileFilled)
+	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), rowsAffected)
+	profileItem := entity.Profile{}
+	profileItem, err = profileRepository.GetByEmailOrPhone(ctxRepository, profileFilled.Email, profileFilled.Phone)
+	assert.Nil(t, err)
+	cleanAtInProfile(&profileItem, &profileFilled)
+	assert.Equal(t, profileFilled, profileItem)
 }
