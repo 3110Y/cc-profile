@@ -1,0 +1,10 @@
+GRPC grpc://localhost:5300/profileService.ProfileService/Add
+
+{
+  "email": "email",
+  "phone": 611,
+  "password": "password8",
+  "surname": "surname",
+  "name": "name",
+  "patronymic": "patronymic"
+}
