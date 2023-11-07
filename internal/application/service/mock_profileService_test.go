@@ -36,10 +36,10 @@ func (m *MockProfileRepositoryInterface) EXPECT() *MockProfileRepositoryInterfac
 }
 
 // Add mocks base method.
-func (m *MockProfileRepositoryInterface) Add(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+func (m *MockProfileRepositoryInterface) Add(arg0 context.Context, arg1 entity.Profile) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Add(arg0, arg1 interface{}
 }
 
 // ChangePassword mocks base method.
-func (m *MockProfileRepositoryInterface) ChangePassword(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+func (m *MockProfileRepositoryInterface) ChangePassword(arg0 context.Context, arg1 entity.Profile) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangePassword", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,10 +66,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) ChangePassword(arg0, arg1 
 }
 
 // Count mocks base method.
-func (m *MockProfileRepositoryInterface) Count(arg0 context.Context) (uint64, error) {
+func (m *MockProfileRepositoryInterface) Count(arg0 context.Context) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Count", arg0)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Count(arg0 interface{}) *g
 }
 
 // Delete mocks base method.
-func (m *MockProfileRepositoryInterface) Delete(arg0 context.Context, arg1 string) (uint64, error) {
+func (m *MockProfileRepositoryInterface) Delete(arg0 context.Context, arg1 string) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,10 +96,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Delete(arg0, arg1 interfac
 }
 
 // Edit mocks base method.
-func (m *MockProfileRepositoryInterface) Edit(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+func (m *MockProfileRepositoryInterface) Edit(arg0 context.Context, arg1 entity.Profile) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Edit", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,10 +111,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Edit(arg0, arg1 interface{
 }
 
 // EditWithoutPassword mocks base method.
-func (m *MockProfileRepositoryInterface) EditWithoutPassword(arg0 context.Context, arg1 entity.Profile) (uint64, error) {
+func (m *MockProfileRepositoryInterface) EditWithoutPassword(arg0 context.Context, arg1 entity.Profile) (*uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EditWithoutPassword", arg0, arg1)
-	ret0, _ := ret[0].(uint64)
+	ret0, _ := ret[0].(*uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -126,10 +126,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) EditWithoutPassword(arg0, 
 }
 
 // Get mocks base method.
-func (m *MockProfileRepositoryInterface) Get(arg0 context.Context, arg1 string) (entity.Profile, error) {
+func (m *MockProfileRepositoryInterface) Get(arg0 context.Context, arg1 string) (*entity.Profile, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1)
-	ret0, _ := ret[0].(entity.Profile)
+	ret0, _ := ret[0].(*entity.Profile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -141,10 +141,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) Get(arg0, arg1 interface{}
 }
 
 // GetByEmailOrPhone mocks base method.
-func (m *MockProfileRepositoryInterface) GetByEmailOrPhone(arg0 context.Context, arg1 string, arg2 uint64) (entity.Profile, error) {
+func (m *MockProfileRepositoryInterface) GetByEmailOrPhone(arg0 context.Context, arg1 string, arg2 uint64) (*entity.Profile, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByEmailOrPhone", arg0, arg1, arg2)
-	ret0, _ := ret[0].(entity.Profile)
+	ret0, _ := ret[0].(*entity.Profile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -156,10 +156,10 @@ func (mr *MockProfileRepositoryInterfaceMockRecorder) GetByEmailOrPhone(arg0, ar
 }
 
 // List mocks base method.
-func (m *MockProfileRepositoryInterface) List(arg0 context.Context, arg1, arg2 uint64) ([]entity.Profile, error) {
+func (m *MockProfileRepositoryInterface) List(arg0 context.Context, arg1, arg2 uint64) (*[]entity.Profile, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2)
-	ret0, _ := ret[0].([]entity.Profile)
+	ret0, _ := ret[0].(*[]entity.Profile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -194,10 +194,10 @@ func (m *MockPasswordServiceInterface) EXPECT() *MockPasswordServiceInterfaceMoc
 }
 
 // Encode mocks base method.
-func (m *MockPasswordServiceInterface) Encode(arg0 string) (string, error) {
+func (m *MockPasswordServiceInterface) Encode(arg0 string) (*string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Encode", arg0)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(*string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
