@@ -51,7 +51,7 @@ func TestProfile_Add(t *testing.T) {
 	profileEntity := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileEntity)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	var profileList []entity.Profile
 	err = database.SelectAll(&profileList, "profile", connect)
 	assert.Nil(t, err)
@@ -60,18 +60,28 @@ func TestProfile_Add(t *testing.T) {
 	assert.Equal(t, profileEntity, profileList[0])
 }
 
+func TestProfile_Add_Fail(t *testing.T) {
+	defer database.Clean(t, "profile", connect)
+	profileEntity := getEntityProfile()
+	rowsAffected, err := profileRepository.Add(ctxRepository, profileEntity)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), *rowsAffected)
+	rowsAffected, err = profileRepository.Add(ctxRepository, profileEntity)
+	assert.Nil(t, rowsAffected)
+	assert.NotNil(t, err)
+}
+
 func TestProfile_Get(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileFilled := getEntityProfile()
 	assert.NotNil(t, profileFilled)
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
-	profileItem := entity.Profile{}
-	profileItem, err = profileRepository.Get(ctxRepository, profileFilled.Id)
+	assert.Equal(t, uint64(1), *rowsAffected)
+	profileItem, err := profileRepository.Get(ctxRepository, profileFilled.Id)
 	assert.Nil(t, err)
-	cleanAtInProfile(&profileItem, &profileFilled)
-	assert.Equal(t, profileFilled, profileItem)
+	cleanAtInProfile(profileItem, &profileFilled)
+	assert.Equal(t, profileFilled, *profileItem)
 }
 
 func TestProfile_List(t *testing.T) {
@@ -79,26 +89,26 @@ func TestProfile_List(t *testing.T) {
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileFilled = getEntityProfile()
 	rowsAffected, err = profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileList, err := profileRepository.List(ctxRepository, 2, 1)
 	assert.Nil(t, err)
-	assert.Len(t, profileList, 2)
+	assert.Len(t, *profileList, 2)
 	profileList, err = profileRepository.List(ctxRepository, 1, 1)
 	assert.Nil(t, err)
-	assert.Len(t, profileList, 1)
+	assert.Len(t, *profileList, 1)
 	profileList, err = profileRepository.List(ctxRepository, 1, 2)
 	assert.Nil(t, err)
-	assert.Len(t, profileList, 1)
+	assert.Len(t, *profileList, 1)
 	profileList, err = profileRepository.List(ctxRepository, 10, 1)
 	assert.Nil(t, err)
-	assert.Len(t, profileList, 2)
+	assert.Len(t, *profileList, 2)
 	profileList, err = profileRepository.List(ctxRepository, 10, 2)
 	assert.Nil(t, err)
-	assert.Len(t, profileList, 0)
+	assert.Len(t, *profileList, 0)
 }
 
 func TestProfile_Delete(t *testing.T) {
@@ -106,25 +116,25 @@ func TestProfile_Delete(t *testing.T) {
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileFilledTwo := getEntityProfile()
 	rowsAffected, err = profileRepository.Add(ctxRepository, profileFilledTwo)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	var profileList []entity.Profile
 	err = database.Select(&profileList, "profile", 2, 1, connect)
 	assert.Nil(t, err)
 	assert.Len(t, profileList, 2)
 	rowsAffected, err = profileRepository.Delete(ctxRepository, profileFilled.Id)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileList = []entity.Profile{}
 	err = database.Select(&profileList, "profile", 2, 1, connect)
 	assert.Nil(t, err)
 	assert.Len(t, profileList, 1)
 	rowsAffected, err = profileRepository.Delete(ctxRepository, profileFilledTwo.Id)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileList = []entity.Profile{}
 	err = database.Select(&profileList, "profile", 2, 1, connect)
 	assert.Nil(t, err)
@@ -136,7 +146,7 @@ func TestProfile_Edit(t *testing.T) {
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntity := entity.Profile{
 		Id:         profileFilled.Id,
 		Email:      "Email2",
@@ -148,7 +158,7 @@ func TestProfile_Edit(t *testing.T) {
 	}
 	rowsAffected, err = profileRepository.Edit(ctxRepository, profileEntity)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntityFilled := entity.Profile{}
 	err = database.GetById(&profileEntityFilled, "profile", profileEntity.Id, connect)
 	assert.Nil(t, err)
@@ -165,11 +175,11 @@ func TestProfile_Count(t *testing.T) {
 		profileFilled := getEntityProfile()
 		rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 		assert.Nil(t, err)
-		assert.Equal(t, uint64(1), rowsAffected)
+		assert.Equal(t, uint64(1), *rowsAffected)
 	}
 	count, err := profileRepository.Count(ctxRepository)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(2), count)
+	assert.Equal(t, uint64(2), *count)
 }
 
 func TestProfileRepository_EditWithoutPassword(t *testing.T) {
@@ -177,7 +187,7 @@ func TestProfileRepository_EditWithoutPassword(t *testing.T) {
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntity := entity.Profile{
 		Id:         profileFilled.Id,
 		Email:      "Email2",
@@ -188,7 +198,7 @@ func TestProfileRepository_EditWithoutPassword(t *testing.T) {
 	}
 	rowsAffected, err = profileRepository.EditWithoutPassword(ctxRepository, profileEntity)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntityFilled := entity.Profile{}
 	err = database.GetById(&profileEntityFilled, "profile", profileEntity.Id, connect)
 	assert.Nil(t, err)
@@ -206,14 +216,14 @@ func TestProfileRepository_ChangePassword(t *testing.T) {
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntity := entity.Profile{
 		Id:       profileFilled.Id,
 		Password: "Password82",
 	}
 	rowsAffected, err = profileRepository.ChangePassword(ctxRepository, profileEntity)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
+	assert.Equal(t, uint64(1), *rowsAffected)
 	profileEntityFilled := entity.Profile{}
 	err = database.GetById(&profileEntityFilled, "profile", profileEntity.Id, connect)
 	assert.Nil(t, err)
@@ -226,10 +236,9 @@ func TestProfileRepository_GetByEmailOrPhone(t *testing.T) {
 	assert.NotNil(t, profileFilled)
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), rowsAffected)
-	profileItem := entity.Profile{}
-	profileItem, err = profileRepository.GetByEmailOrPhone(ctxRepository, profileFilled.Email, profileFilled.Phone)
+	assert.Equal(t, uint64(1), *rowsAffected)
+	profileItem, err := profileRepository.GetByEmailOrPhone(ctxRepository, profileFilled.Email, profileFilled.Phone)
 	assert.Nil(t, err)
-	cleanAtInProfile(&profileItem, &profileFilled)
-	assert.Equal(t, profileFilled, profileItem)
+	cleanAtInProfile(profileItem, &profileFilled)
+	assert.Equal(t, profileFilled, *profileItem)
 }

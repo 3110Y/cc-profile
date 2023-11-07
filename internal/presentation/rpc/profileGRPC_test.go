@@ -99,9 +99,9 @@ func TestProfileRPC_Item(t *testing.T) {
 	in := profileGRPC.ProfileId{
 		Id: profileEntity.Id,
 	}
-	add, err := profileRPC.Item(ctx, &in)
+	profileWithoutPassword, err := profileRPC.Item(ctx, &in)
 	assert.Nil(t, err)
-	assert.Equal(t, profileEntity.Id, add.Id)
+	assert.Equal(t, profileEntity.Id, profileWithoutPassword.Id)
 }
 
 func TestProfileRPC_Delete(t *testing.T) {

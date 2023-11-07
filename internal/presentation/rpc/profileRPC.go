@@ -9,19 +9,19 @@ import (
 )
 
 type ServiceProfileInterface interface {
-	Add(ctx context.Context, profileDTO dto.ProfileDTO) (id string, err error)
-	Edit(ctx context.Context, profileDTO dto.ProfileDTO) (uint64, error)
-	Item(ctx context.Context, id string) (profileDto dto.ProfileDTO, err error)
-	Delete(ctx context.Context, id string) (uint64, error)
-	List(ctx context.Context, onPage uint64, page uint64) (dto.ProfileListDTO, error)
-	EditWithoutPassword(ctx context.Context, profileDTO dto.ProfileDTO) (uint64, error)
-	ChangePassword(ctx context.Context, profileDTO dto.ProfileDTO) (uint64, error)
+	Add(ctx context.Context, profileDTO dto.ProfileDTO) (id *string, err error)
+	Edit(ctx context.Context, profileDTO dto.ProfileDTO) (*uint64, error)
+	Item(ctx context.Context, id string) (profileDto *dto.ProfileDTO, err error)
+	Delete(ctx context.Context, id string) (*uint64, error)
+	List(ctx context.Context, onPage uint64, page uint64) (*dto.ProfileListDTO, error)
+	EditWithoutPassword(ctx context.Context, profileDTO dto.ProfileDTO) (*uint64, error)
+	ChangePassword(ctx context.Context, profileDTO dto.ProfileDTO) (*uint64, error)
 	GetByEmailOrPhone(
 		ctx context.Context,
 		email string,
 		phone uint64,
 		password string,
-	) (profileDto dto.ProfileDTO, err error)
+	) (profileDto *dto.ProfileDTO, err error)
 }
 
 type ValidatorProfileInterface interface {
@@ -70,7 +70,7 @@ func (p *ProfileRPC) Add(
 		return nil, err
 	}
 	id, err := p.serviceProfile.Add(ctx, profileDto)
-	return &profileGRPC.ProfileId{Id: id}, err
+	return &profileGRPC.ProfileId{Id: *id}, err
 }
 
 func (p *ProfileRPC) Item(ctx context.Context, in *profileGRPC.ProfileId) (*profileGRPC.ProfileWithoutPassword, error) {
@@ -78,7 +78,7 @@ func (p *ProfileRPC) Item(ctx context.Context, in *profileGRPC.ProfileId) (*prof
 	if err != nil {
 		return nil, err
 	}
-	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
+	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: *profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
 	return &out, nil
 }
 
@@ -109,7 +109,7 @@ func (p *ProfileRPC) List(ctx context.Context, in *profileGRPC.ProfilePaginator)
 	if err != nil {
 		return nil, err
 	}
-	profileList := utlits.Pointer(mapping.ProfileListDTOMapping{ProfileListDTO: profileListDTO}).ToProfileListGRPC()
+	profileList := utlits.Pointer(mapping.ProfileListDTOMapping{ProfileListDTO: *profileListDTO}).ToProfileListGRPC()
 	return &profileList, nil
 }
 
@@ -158,6 +158,6 @@ func (p *ProfileRPC) GetByEmailOrPhone(
 	if err != nil {
 		return nil, err
 	}
-	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
+	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: *profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
 	return &out, nil
 }
