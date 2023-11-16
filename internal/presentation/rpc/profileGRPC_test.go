@@ -17,6 +17,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"strconv"
 	"testing"
 )
 
@@ -152,7 +153,19 @@ func TestProfileRPC_List(t *testing.T) {
 	count := uint64(3)
 	onPage := uint64(2)
 	for i := uint64(0); i < count; i++ {
-		add(t)
+		profileEntity := entity.Profile{
+			Id:         uuid.New().String(),
+			Email:      "Email" + strconv.Itoa(int(i)),
+			Phone:      79062579331 + i,
+			Password:   "Password8",
+			Surname:    "Surname",
+			Name:       "Name",
+			Patronymic: "Patronymic",
+		}
+		passwordSHA := sha512.Sum512([]byte(profileEntity.Password))
+		profileEntity.Password = hex.EncodeToString(passwordSHA[:])
+		_, err := repositoryProfile.Add(ctx, profileEntity)
+		assert.Nil(t, err)
 	}
 	profileList, err := profileRPC.List(ctx, &profileGRPC.ProfilePaginator{OnPage: onPage, Page: 1})
 	assert.Nil(t, err)

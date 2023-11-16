@@ -26,7 +26,8 @@ func main() {
 	if err != nil {
 		grpclog.Fatalf("failed", err)
 	}
-	profileGRPC.RegisterProfileServiceServer(grpcServer, initializeDI.ProfileRPC)
+	profileGRPC.RegisterProfileServer(grpcServer, initializeDI.ProfileRPC)
+	profileGRPC.RegisterRoleServer(grpcServer, initializeDI.RoleRPC)
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		grpclog.Fatalf("failed to listen: %v", err)

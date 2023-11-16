@@ -32,7 +32,7 @@ func getEntityProfile() entity.Profile {
 	}
 }
 
-func prepare(t *testing.T) (
+func prepareProfile(t *testing.T) (
 	func(),
 	*MockProfileRepositoryInterface,
 	*MockPasswordServiceInterface,
@@ -52,7 +52,7 @@ func prepare(t *testing.T) (
 
 func TestProfileService_Add(t *testing.T) {
 	t.Parallel()
-	finish, repository, passwordService, profile, entityProfile := prepare(t)
+	finish, repository, passwordService, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	passwordService.EXPECT().Encode(entityProfile.Password).Return(&entityProfile.Password, nil)
@@ -64,7 +64,7 @@ func TestProfileService_Add(t *testing.T) {
 
 func TestProfileService_Edit(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	repository.EXPECT().Edit(ctx, entityProfile).Return(utlits.Pointer(uint64(1)), nil)
@@ -75,7 +75,7 @@ func TestProfileService_Edit(t *testing.T) {
 
 func TestProfileService_Item(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	repository.EXPECT().Get(ctx, entityProfile.Id).Return(&entityProfile, nil)
@@ -86,7 +86,7 @@ func TestProfileService_Item(t *testing.T) {
 
 func TestProfileService_Delete(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	repository.EXPECT().Delete(ctx, entityProfile.Id).Return(utlits.Pointer(uint64(1)), nil)
 	rowsAffected, err := profile.Delete(ctx, entityProfile.Id)
@@ -96,7 +96,7 @@ func TestProfileService_Delete(t *testing.T) {
 
 func TestProfileService_List(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	entityList := []entity.Profile{entityProfile, entityProfile}
 	profileListDTO := dto.ProfileListDTO{
@@ -114,7 +114,7 @@ func TestProfileService_List(t *testing.T) {
 
 func TestProfileService_EditWithoutPassword(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	repository.EXPECT().EditWithoutPassword(ctx, entityProfile).Return(utlits.Pointer(uint64(1)), nil)
@@ -125,7 +125,7 @@ func TestProfileService_EditWithoutPassword(t *testing.T) {
 
 func TestProfileService_ChangePassword(t *testing.T) {
 	t.Parallel()
-	finish, repository, _, profile, entityProfile := prepare(t)
+	finish, repository, _, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	repository.EXPECT().ChangePassword(ctx, entityProfile).Return(utlits.Pointer(uint64(1)), nil)
@@ -136,7 +136,7 @@ func TestProfileService_ChangePassword(t *testing.T) {
 
 func TestProfileService_GetByEmailOrPhone(t *testing.T) {
 	t.Parallel()
-	finish, repository, passwordService, profile, entityProfile := prepare(t)
+	finish, repository, passwordService, profile, entityProfile := prepareProfile(t)
 	defer finish()
 	dtoProfile := utlits.Pointer(mapping.ProfileEntityMapping{Entity: entityProfile}).ToProfileDTO()
 	repository.EXPECT().GetByEmailOrPhone(ctx, entityProfile.Email, entityProfile.Phone).Return(&entityProfile, nil)

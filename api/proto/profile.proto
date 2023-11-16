@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package profileService;
+package profile;
 
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/3110Y/profile;profileGRPC";
 
-service ProfileService {
+service Profile {
   rpc Add(ProfileWithoutIdSystemField) returns(ProfileId);
   rpc Edit(ProfileWithoutSystemField) returns(EmptyResponse);
   rpc Delete(ProfileId) returns(EmptyResponse);
