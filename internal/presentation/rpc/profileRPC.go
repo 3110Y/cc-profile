@@ -31,7 +31,7 @@ type ValidatorProfileInterface interface {
 }
 
 type ProfileRPC struct {
-	profileGRPC.UnimplementedProfileServiceServer
+	profileGRPC.UnimplementedProfileServer
 	serviceProfile   ServiceProfileInterface
 	validatorProfile ValidatorProfileInterface
 }

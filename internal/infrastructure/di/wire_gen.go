@@ -13,7 +13,7 @@ import (
 	"github.com/3110Y/profile/internal/infrastructure/repository"
 	"github.com/3110Y/profile/internal/presentation/rpc"
 	"github.com/jmoiron/sqlx"
- )
+)
 
 // Injectors from wire.go:
 
@@ -27,7 +27,10 @@ func InitializeDI() (*DI, error) {
 	profileService := service.NewProfileService(profileRepository, passwordService)
 	profileValidator := validator.NewProfileValidator()
 	profileRPC := rpc.NewProfileRPC(profileService, profileValidator)
-	di := NewDI(profileService, profileValidator, profileRepository, profileRPC, db)
+	roleRepository := repository.NewRoleRepository(db)
+	roleService := service.NewRoleService(roleRepository)
+	roleRPC := rpc.NewRoleRPC(roleService)
+	di := NewDI(profileService, profileValidator, profileRepository, profileRPC, db, roleRepository, roleService, roleRPC)
 	return di, nil
 }
 
@@ -39,6 +42,9 @@ type DI struct {
 	ProfileRepository *repository.ProfileRepository
 	ProfileRPC        *rpc.ProfileRPC
 	DB                *sqlx.DB
+	RoleRepository    *repository.RoleRepository
+	RoleService       *service.RoleService
+	RoleRPC           *rpc.RoleRPC
 }
 
 func NewDI(
@@ -47,6 +53,9 @@ func NewDI(
 	profileRepository *repository.ProfileRepository,
 	profileRPC *rpc.ProfileRPC,
 	DB *sqlx.DB,
+	RoleRepository *repository.RoleRepository,
+	RoleService *service.RoleService,
+	RoleRPC *rpc.RoleRPC,
 ) *DI {
 	return &DI{
 		ProfileService:    profileService,
@@ -54,5 +63,8 @@ func NewDI(
 		ProfileRepository: profileRepository,
 		ProfileRPC:        profileRPC,
 		DB:                DB,
+		RoleRepository:    RoleRepository,
+		RoleService:       RoleService,
+		RoleRPC:           RoleRPC,
 	}
 }

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package profile;
+
+option go_package = "github.com/3110Y/profile;profileGRPC";
+
+service Role {
+  rpc Item(RoleId) returns(RoleItem);
+  rpc List(RoleDTOPaginator) returns(RoleDTOListItem);
+}
+
+message RoleItem {
+  string id = 1;
+  string name = 2;
+}
+
+message RoleId {
+  string id = 1;
+}
+
+
+message RoleDTOPaginator {
+  uint64 onPage = 1;
+  uint64 page = 2;
+}
+
+message RoleDTOListItem {
+  repeated RoleItem data = 1;
+  uint64 AllCount = 2;
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"strconv"
 	"testing"
 )
 
@@ -46,7 +47,7 @@ func init() {
 	ctxRepository = context.Background()
 }
 
-func TestProfile_Add(t *testing.T) {
+func TestProfileRepository_Add(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileEntity := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileEntity)
@@ -60,7 +61,7 @@ func TestProfile_Add(t *testing.T) {
 	assert.Equal(t, profileEntity, profileList[0])
 }
 
-func TestProfile_Add_Fail(t *testing.T) {
+func TestProfileRepository_Add_Fail(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileEntity := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileEntity)
@@ -71,7 +72,7 @@ func TestProfile_Add_Fail(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestProfile_Get(t *testing.T) {
+func TestProfileRepository_Get(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileFilled := getEntityProfile()
 	assert.NotNil(t, profileFilled)
@@ -84,13 +85,15 @@ func TestProfile_Get(t *testing.T) {
 	assert.Equal(t, profileFilled, *profileItem)
 }
 
-func TestProfile_List(t *testing.T) {
+func TestProfileRepository_List(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), *rowsAffected)
 	profileFilled = getEntityProfile()
+	profileFilled.Email = profileFilled.Email + "two"
+	profileFilled.Phone = 79062579332
 	rowsAffected, err = profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), *rowsAffected)
@@ -111,13 +114,15 @@ func TestProfile_List(t *testing.T) {
 	assert.Len(t, *profileList, 0)
 }
 
-func TestProfile_Delete(t *testing.T) {
+func TestProfileRepository_Delete(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), *rowsAffected)
 	profileFilledTwo := getEntityProfile()
+	profileFilledTwo.Email = profileFilledTwo.Email + "two"
+	profileFilledTwo.Phone = 79062579332
 	rowsAffected, err = profileRepository.Add(ctxRepository, profileFilledTwo)
 	assert.Nil(t, err)
 	assert.Equal(t, uint64(1), *rowsAffected)
@@ -141,7 +146,7 @@ func TestProfile_Delete(t *testing.T) {
 	assert.Len(t, profileList, 0)
 }
 
-func TestProfile_Edit(t *testing.T) {
+func TestProfileRepository_Edit(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	profileFilled := getEntityProfile()
 	rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
@@ -169,10 +174,13 @@ func TestProfile_Edit(t *testing.T) {
 	assert.Equal(t, profileEntity, profileEntityFilled)
 }
 
-func TestProfile_Count(t *testing.T) {
+func TestProfileRepository_Count(t *testing.T) {
 	defer database.Clean(t, "profile", connect)
 	for i, iMax := 0, 2; i < iMax; i++ {
 		profileFilled := getEntityProfile()
+		iString := strconv.Itoa(i)
+		profileFilled.Email = profileFilled.Email + iString
+		profileFilled.Phone = profileFilled.Phone + uint64(i)
 		rowsAffected, err := profileRepository.Add(ctxRepository, profileFilled)
 		assert.Nil(t, err)
 		assert.Equal(t, uint64(1), *rowsAffected)
