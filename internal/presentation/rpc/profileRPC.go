@@ -6,6 +6,8 @@ import (
 	"github.com/3110Y/profile/internal/application/dto"
 	"github.com/3110Y/profile/internal/application/mapping"
 	"github.com/3110Y/profile/pkg/profileGRPC"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ServiceProfileInterface interface {
@@ -67,7 +69,7 @@ func (p *ProfileRPC) Add(
 	).ToProfileDTO()
 	err := p.validateProfileDTO(profileDto)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 	id, err := p.serviceProfile.Add(ctx, profileDto)
 	return &profileGRPC.ProfileId{Id: *id}, err
@@ -76,7 +78,7 @@ func (p *ProfileRPC) Add(
 func (p *ProfileRPC) Item(ctx context.Context, in *profileGRPC.ProfileId) (*profileGRPC.ProfileWithoutPassword, error) {
 	profileWithoutPassword, err := p.serviceProfile.Item(ctx, in.Id)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: *profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
 	return &out, nil
@@ -84,7 +86,10 @@ func (p *ProfileRPC) Item(ctx context.Context, in *profileGRPC.ProfileId) (*prof
 
 func (p *ProfileRPC) Delete(ctx context.Context, in *profileGRPC.ProfileId) (*profileGRPC.EmptyResponse, error) {
 	_, err := p.serviceProfile.Delete(ctx, in.Id)
-	return &profileGRPC.EmptyResponse{}, err
+	if err != nil {
+		return &profileGRPC.EmptyResponse{}, status.Errorf(codes.Internal, err.Error())
+	}
+	return &profileGRPC.EmptyResponse{}, nil
 }
 
 func (p *ProfileRPC) Edit(
@@ -98,7 +103,7 @@ func (p *ProfileRPC) Edit(
 	).ToProfileDTO()
 	err := p.validateProfileDTO(profileDto)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 	_, err = p.serviceProfile.Edit(ctx, profileDto)
 	return &profileGRPC.EmptyResponse{}, err
@@ -107,7 +112,7 @@ func (p *ProfileRPC) Edit(
 func (p *ProfileRPC) List(ctx context.Context, in *profileGRPC.ProfilePaginator) (*profileGRPC.ProfileList, error) {
 	profileListDTO, err := p.serviceProfile.List(ctx, in.OnPage, in.Page)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	profileList := utlits.Pointer(mapping.ProfileListDTOMapping{ProfileListDTO: *profileListDTO}).ToProfileListGRPC()
 	return &profileList, nil
@@ -124,11 +129,11 @@ func (p *ProfileRPC) EditWithoutPassword(
 	).ToProfileDTO()
 	err := p.validatorProfile.ValidEmail(profileDto.Email)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 	err = p.validatorProfile.ValidPhone(profileDto.Phone)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 	_, err = p.serviceProfile.EditWithoutPassword(ctx, profileDto)
 	return &profileGRPC.EmptyResponse{}, err
@@ -144,7 +149,7 @@ func (p *ProfileRPC) ChangePassword(
 	}
 	err := p.validatorProfile.ValidPassword(*profileDto.Password)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 	_, err = p.serviceProfile.EditWithoutPassword(ctx, profileDto)
 	return &profileGRPC.EmptyResponse{}, err
@@ -156,7 +161,7 @@ func (p *ProfileRPC) GetByEmailOrPhone(
 ) (*profileGRPC.ProfileWithoutPassword, error) {
 	profileWithoutPassword, err := p.serviceProfile.GetByEmailOrPhone(ctx, in.Email, in.Phone, in.Password)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 	out := utlits.Pointer(mapping.ProfileDTOMapping{ProfileDTO: *profileWithoutPassword}).ToProfileWithoutPasswordGRPC()
 	return &out, nil
