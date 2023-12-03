@@ -16,7 +16,7 @@ func NewRoleRepository(db *sqlx.DB) *RoleRepository {
 
 func (r *RoleRepository) Get(ctx context.Context, id string) (*entity.Role, error) {
 	pr := entity.Role{}
-	err := r.db.GetContext(ctx, &pr, "SELECT * FROM role WHERE id = $1", id)
+	err := r.db.GetContext(ctx, &pr, "SELECT* FROM role WHERE id = $1", id)
 	return &pr, err
 }
 
